@@ -40,7 +40,32 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
     :param item: The item to validate
     :param result: The ValidationResult object to update
     """
-    pass
+
+    if not isinstance(item.get('bus_id'), int):
+        result.bus_id_errors += 1
+
+    if not isinstance(item.get('stop_id'), int):
+        result.stop_id_errors += 1
+
+    stop_name = item.get('stop_name')
+    if not (isinstance(stop_name, str) and stop_name and
+            stop_name[0].isupper() and
+            stop_name.endswith(('Street', 'Avenue', 'Boulevard', 'Drive'))):
+        result.stop_name_errors += 1
+
+    if not isinstance(item.get('next_stop'), int):
+        result.next_stop_errors += 1
+
+    stop_type = item.get('stop_type')
+    if stop_type not in ('S', 'O', 'F', ''):
+        result.stop_type_errors += 1
+
+    a_time = item.get('a_time')
+    if not (isinstance(a_time, str) and len(a_time) == 5 and
+            a_time[2] == ':' and
+            a_time[:2].isdigit() and 0 <= int(a_time[:2]) < 24 and
+            a_time[3:].isdigit() and 0 <= int(a_time[3:]) < 60):
+        result.a_time_errors += 1
 
 
 def validate_data(data: List[Dict]) -> None:
