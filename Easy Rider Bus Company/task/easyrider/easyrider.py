@@ -1,4 +1,5 @@
 import json
+import re
 from dataclasses import dataclass
 from typing import Dict, List
 
@@ -48,9 +49,9 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
         result.stop_id_errors += 1
 
     stop_name = item.get('stop_name')
-    if not (isinstance(stop_name, str) and stop_name):
-        # and stop_name[0].isupper() ):
-        # and stop_name.lower().endswith(('road', 'avenue', 'boulevard', 'street'))):
+    if not (isinstance(stop_name, str) and stop_name
+            and re.match(r'[A-Z]\w+[\s\W+\w+\s]* (Road|Avenue|Boulevard|Street)$', stop_name)
+    ):
         result.stop_name_errors += 1
 
     if not isinstance(item.get('next_stop'), int):
