@@ -224,20 +224,7 @@ def main():
 
     # data validation
     validation_result = validate_data(data)
-    # todo: add bus line time validation, use validation_result to collect errors
-    for line in bus_company.bus_lines:
-        for stop in line.stops:
-            if stop.stop_type == 'S':
-                previous_time = stop.a_time
-            else:
-                current_time = stop.a_time
-                # checking if consecutive stops have increasing a_time
-                if a_time_to_minutes(current_time) < a_time_to_minutes(previous_time):
-                    validation_result.a_time_errors += 1
-                    # stop checking that line on first error found
-                    break
-
-                previous_time = current_time
+    validate_bus_arrival_times(bus_company, validation_result)
 
     print(validation_result)
     print()
@@ -253,6 +240,27 @@ def main():
     # validate times of consecutive stops
     # bus stops by bus_id already sorted in input
     # check if times are in increasing order
+
+
+def validate_bus_arrival_times(bus_company: BusCompany, validation_result: ValidationResult):
+    """Validate that arrival times of consecutive stops are in increasing order.
+
+    Use ValidationResult to track number of errors found
+    """
+
+    for line in bus_company.bus_lines:
+        for stop in line.stops:
+            if stop.stop_type == 'S':
+                previous_time = stop.a_time
+            else:
+                current_time = stop.a_time
+                # checking if consecutive stops have increasing a_time
+                if a_time_to_minutes(current_time) < a_time_to_minutes(previous_time):
+                    validation_result.a_time_errors += 1
+                    # stop checking that line on first error found
+                    break
+
+                previous_time = current_time
 
 
 if __name__ == '__main__':
