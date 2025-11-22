@@ -35,7 +35,7 @@ class BusLine:
 
     def __init__(self, line_id: int):
         self.line_id = line_id  # corresponds to bus_id
-        self.stops = []
+        self.stops: List[BusStop] = []
 
     def get_number_of_stops(self) -> int:
         """Return the number of stops in the bus line."""
@@ -75,7 +75,6 @@ class BusCompany:
         self.data = data
 
         for item in data:
-            bus_id = item.get('bus_id')
             stop = BusStop(
                 bus_id=item.get('bus_id'),
                 stop_id=item.get('stop_id'),
@@ -213,11 +212,33 @@ def print_bus_stops(bus_stops: Dict[int, int]) -> None:
         print(f'Bus {bus_id}: stops: {bus_stops[bus_id]}')
 
 
+def a_time_to_minutes(a_time: str) -> int:
+    """Convert a_time in 'HH:MM' format to total minutes since midnight."""
+    hours, minutes = map(int, a_time.split(':'))
+    return hours * 60 + minutes
+
+
 def main():
     data = json.loads(input())
+    bus_company = BusCompany(data)
 
     # data validation
     validation_result = validate_data(data)
+    # todo: add bus line time validation, use validation_result to collect errors
+    for line in bus_company.bus_lines:
+        for stop in line.stops:
+            if stop.stop_type == 'S':
+                previous_time = stop.a_time
+            else:
+                current_time = stop.a_time
+                # checking if consecutive stops have increasing a_time
+                if a_time_to_minutes(current_time) < a_time_to_minutes(previous_time):
+                    validation_result.a_time_errors += 1
+                    # stop checking that line on first error found
+                    break
+
+                previous_time = current_time
+
     print(validation_result)
     print()
 
@@ -226,9 +247,12 @@ def main():
     print()
 
     # business logic validation
-    bus_company = BusCompany(data)
     bus_company.print_line_info()
     bus_company.print_stops_info()
+
+    # validate times of consecutive stops
+    # bus stops by bus_id already sorted in input
+    # check if times are in increasing order
 
 
 if __name__ == '__main__':
