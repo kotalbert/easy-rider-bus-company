@@ -97,8 +97,10 @@ class BusCompany:
         for line in self.bus_lines:
             if line.stops and line.line_id == stop.bus_id:
                 return line
-        # create new line
-        return BusLine(stop.bus_id)
+        # create new line and add to bus lines tracked by bus company
+        new_line = BusLine(stop.bus_id)
+        self.bus_lines.append(new_line)
+        return new_line
 
     def print_line_info(self):
         for line in self.bus_lines:
@@ -214,8 +216,11 @@ def main():
     # data validation
     validation_result = validate_data(data)
     print(validation_result)
+    print()
+
     bus_stops_count = count_bus_stops(data)
     print_bus_stops(bus_stops_count)
+    print()
 
     # business logic validation
     bus_company = BusCompany(data)
