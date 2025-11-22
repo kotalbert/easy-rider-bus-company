@@ -1,5 +1,6 @@
 import json
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List
 
@@ -50,8 +51,7 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
 
     stop_name = item.get('stop_name')
     if not (isinstance(stop_name, str) and stop_name
-            and re.match(r'[A-Z]\w+[\s\W+\w+\s]* (Road|Avenue|Boulevard|Street)$', stop_name)
-    ):
+            and re.match(r'[A-Z]\w+[\s\W+\w+\s]* (Road|Avenue|Boulevard|Street)$', stop_name)):
         result.stop_name_errors += 1
 
     if not isinstance(item.get('next_stop'), int):
@@ -69,7 +69,7 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
         result.a_time_errors += 1
 
 
-def validate_data(data: List[Dict]) -> None:
+def validate_data(data: List[Dict]) -> ValidationResult:
     """Validate the input data and print the validation results."""
 
     result = ValidationResult()
@@ -77,12 +77,40 @@ def validate_data(data: List[Dict]) -> None:
     for item in data:
         validate_item(item, result)
 
-    print(result)
+    return result
 
+
+def count_bus_stops(data: List[Dict]) -> Dict[int, int]:
+    """ Count the number of stops for each bus_id.
+
+    :param data: List of data from input
+    :return: Dictionary of bus stop counts
+    """
+
+    bus_stops = defaultdict(int)
+
+    for item in data:
+        bus_id = item.get('bus_id')
+        bus_stops[bus_id] += 1
+    return bus_stops
+
+
+def print_bus_stops(bus_stops: Dict[int, int]) -> None:
+    """ Print the number of stops for each bus_id.
+
+    :param bus_stops: Dictionary of bus stop counts
+    """
+    print('Line names and number of stops:')
+    for bus_id in sorted(bus_stops.keys()):
+        print(f'Bus {bus_id}: stops: {bus_stops[bus_id]}')
 
 def main():
     data = json.loads(input())
-    validate_data(data)
+
+    validation_result = validate_data(data)
+    print(validation_result)
+    bus_stops_count = count_bus_stops(data)
+    print_bus_stops(bus_stops_count)
 
 
 if __name__ == '__main__':
