@@ -109,6 +109,7 @@ class BusCompany:
         start_stops = set()
         finish_stops = set()
         transfer_stops = set()
+        on_demand_stops = set()
 
         for line in self.bus_lines:
             for stop in line.stops:
@@ -116,6 +117,8 @@ class BusCompany:
                     start_stops.add(stop.stop_name)
                 elif stop.stop_type == 'F':
                     finish_stops.add(stop.stop_name)
+                elif stop.stop_type == 'O':
+                    on_demand_stops.add(stop.stop_name)
 
         # middle stop is shared by at least two lines
         stop_count = defaultdict(int)
@@ -129,6 +132,7 @@ class BusCompany:
         print(f'Start stops: {len(start_stops)} {sorted(start_stops)}')
         print(f'Transfer stops: {len(transfer_stops)} {sorted(transfer_stops)}')
         print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
+        print(f'On demand stops: {len(on_demand_stops)} {sorted(on_demand_stops)}')
 
 
 def validate_item(item: Dict, result: ValidationResult) -> None:
