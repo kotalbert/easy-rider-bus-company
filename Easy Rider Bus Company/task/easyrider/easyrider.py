@@ -45,12 +45,8 @@ class BusLine:
         """Check if the bus line is valid based on its stops.
         Line is valid if it has exactly one start stop ('S') and one finish stop ('F').
         """
-        start_stops = 0
-        finish_stops = 0
-        for stop in self.stops:
-            start_stops = sum(1 for s in self.stops if s.stop_type == 'S')
-            finish_stops = sum(1 for s in self.stops if s.stop_type == 'F')
-
+        start_stops = sum(1 for s in self.stops if s.stop_type == 'S')
+        finish_stops = sum(1 for s in self.stops if s.stop_type == 'F')
         return start_stops == 1 and finish_stops == 1
 
 
