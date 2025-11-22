@@ -33,11 +33,10 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
     * bus_id: must be an integer
     * stop_id: must be an integer
     * stop_name: must be a non-empty string,
-        must start with a capital letter and end with 'Street', 'Avenue', 'Boulevard', or 'Drive'
+        must start with a capital letter and end with 'Street', 'Avenue', 'Boulevard', or 'Road'
     * next_stop: must be an integer
     * stop_type: must be one of the following characters: 'S', 'O', 'F' or an empty string
     * a_time: string, must be in the format 'HH:MM' (24-hour format)
-    pass
 
     :param item: The item to validate
     :param result: The ValidationResult object to update
@@ -51,7 +50,7 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
 
     stop_name = item.get('stop_name')
     if not (isinstance(stop_name, str) and stop_name
-            and re.match(r'[A-Z]\w+[\s\W+\w+\s]* (Road|Avenue|Boulevard|Street)$', stop_name)):
+            and re.match(r'^[A-Z][a-z]+(?: [A-Z][a-z]+)* (Road|Avenue|Boulevard|Street)$', stop_name)):
         result.stop_name_errors += 1
 
     if not isinstance(item.get('next_stop'), int):
@@ -70,8 +69,11 @@ def validate_item(item: Dict, result: ValidationResult) -> None:
 
 
 def validate_data(data: List[Dict]) -> ValidationResult:
-    """Validate the input data and print the validation results."""
+    """Validate the input data and return the validation results.
 
+    :param data: List of input data dictionaries
+    :return: ValidationResult object containing error counts
+    """
     result = ValidationResult()
 
     for item in data:
@@ -103,6 +105,7 @@ def print_bus_stops(bus_stops: Dict[int, int]) -> None:
     print('Line names and number of stops:')
     for bus_id in sorted(bus_stops.keys()):
         print(f'Bus {bus_id}: stops: {bus_stops[bus_id]}')
+
 
 def main():
     data = json.loads(input())
